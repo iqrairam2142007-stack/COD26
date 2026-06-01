@@ -1,0 +1,24 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>COD26 Portal</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="sidebar">
+        <h2>COD26</h2>
+        <ul>
+            <li><a href="#" onclick="showView('student')">My Learning</a></li>
+            <li><a href="#" onclick="showView('admin')">Admin Dashboard</a></li>
+        </ul>
+    </nav>
+
+    <main id="main-content">
+        <h1>Welcome to COD26</h1>
+        <p>Select a portal to view.</p>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>
