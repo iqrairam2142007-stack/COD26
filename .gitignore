@@ -1,1 +1,5 @@
 node_modules
+build
+.env
+.insforge/
+cod26-defaults.zip

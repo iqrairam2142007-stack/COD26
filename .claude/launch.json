@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "cod26",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["start"],
+      "cwd": "cod26",
+      "port": 3000
+    }
+  ]
+}
