@@ -18,7 +18,8 @@ export function navigate(to, { replace = false } = {}) {
   if (to === currentPath()) return;
   window.history[replace ? "replaceState" : "pushState"]({}, "", to);
   window.dispatchEvent(new Event(EVENT));
-  window.scrollTo(0, 0);
+  // Guarded: jsdom and other non-browser hosts do not implement scrollTo.
+  if (typeof window.scrollTo === "function") window.scrollTo(0, 0);
 }
 
 export function useRoute() {

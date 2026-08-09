@@ -16,7 +16,7 @@ Dashboard: https://insforge.dev/dashboard/project/5409c200-771b-4986-886c-0eec2c
 | Tables | `profiles`, `school_codes`, `quiz_questions`, `quiz_attempts`, `unit_progress`, `activity_logs`, `orders`, `pricing` + `leaderboard_view` |
 | RLS | every table, plus `payments.razorpay_orders` and `payments.stripe_checkout_sessions` |
 | Triggers | `on_auth_user_created`, `profiles_protect_columns`, `on_payment_webhook` |
-| Quiz bank | 36 questions across all 17 units, 0 with a mismatched answer |
+| Quiz bank | **130 questions — 5 per unit across all 26**, 0 with a mismatched answer |
 | Edge functions | `quiz`, `school-code`, `admin`, `chat` — all `active` |
 | Frontend env | `.env` written with real URL + anon key |
 | Build | `npm run build` → compiled successfully |
@@ -219,16 +219,19 @@ and nobody gets access.
 Razorpay only delivers to a public HTTPS URL — `localhost` will not receive
 webhooks. To test the full flow you need the app deployed.
 
-### 3. Make yourself admin — **still outstanding**
+### 3. Admin — **done**
 
-There is currently **no admin account**. The only profile is
-`iofficialcod70@gmail.com` (student, pending). Until someone is promoted, the
-admin dashboard and the video upload screen are unreachable.
+`iofficialcod70@gmail.com` is `role='admin'`, `access_status='active'`. Sign in
+with it to reach the admin dashboard.
 
-Sign up through the app, then promote that address:
+To promote somebody else, or to undo this:
 
 ```bash
-npx @insforge/cli db query "UPDATE public.profiles SET role='admin', access_status='active' WHERE email='YOUR_EMAIL_HERE'"
+npx @insforge/cli db query "UPDATE public.profiles SET role='admin', access_status='active' WHERE email='OTHER_EMAIL'"
+```
+
+```bash
+npx @insforge/cli db query "UPDATE public.profiles SET role='student' WHERE email='iofficialcod70@gmail.com'"
 ```
 
 ---

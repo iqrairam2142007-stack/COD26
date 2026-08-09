@@ -2,87 +2,99 @@
 
 Live site: **https://9eah3y4t.insforge.site**
 
-Tick each box. If one fails, note the case number and what you saw.
+Cases 1–13 have been run against the live site and passed. Cases 14–30 need a
+signed-in browser session and are still open — record your result in the
+Status column as you go.
 
-## Before you start
-
-Cases 20–30 need an admin account. There is none yet — sign up through the
-site, then run:
-
-```bash
-npx @insforge/cli db query "UPDATE public.profiles SET role='admin', access_status='active' WHERE email='YOUR_EMAIL'"
-```
-
-Cases 17–19 need Razorpay keys, which are not configured yet.
+| | |
+|---|---|
+| Last run | 2026-08-09, against live |
+| Automated tests | 71 passing across 9 suites (`npm test`) |
+| Admin account | `iofficialcod70@gmail.com` — promoted, ready to use |
+| Razorpay | **Not configured.** Case 19 will fail until keys are set |
 
 ---
 
-## A. Public site — no account (1–8)
+## A. Public site — no account needed
 
-| # | Do this | Expect |
-|---|---|---|
-| 1 | Open the site root | Home page loads. **Not** the login form |
-| 2 | Scroll the home page | Hero → what COD26 is → units → features → benefits → pricing → footer, all present |
-| 3 | Check the price on the home page | Shows ₹500 / 6 months, read live from the database |
-| 4 | Click "See all 26 units" | Catalogue: 26 units in Beginner (9) / Intermediate (9) / Advanced (8) |
-| 5 | Look at the catalogue | Unit 1 has a green FREE badge; the other 25 show 🔒 "Locked — enrol to unlock" |
-| 6 | Open `/totally-made-up` | A 404 page with "Go home" and "Browse units", not a blank screen |
-| 7 | Open `/dashboard` while signed out | Redirected to the login page, not an error |
-| 8 | Open the site on a phone | Nav collapses to ☰; tapping it opens the menu; nothing overflows sideways |
+| # | Do this | Expect | Status |
+|---|---|---|---|
+| 1 | Open the site root | Home page, **not** the login form | ✅ hero rendered |
+| 2 | Scroll the home page | Hero → about → units → features → benefits → pricing → footer | ✅ all 4 sections + footer |
+| 3 | Check the price | ₹500 / 6 months, read live from the database | ✅ ₹0 and ₹500 tiers |
+| 4 | Click "See all 26 units" | 26 units, Beginner 9 / Intermediate 9 / Advanced 8 | ✅ 26 units |
+| 5 | Look at the catalogue | Unit 1 FREE badge; 25 others locked | ✅ 1 free, 25 locked |
+| 6 | Open `/totally-made-up` | 404 page with a way back | ✅ "Page not found" |
+| 7 | Open `/dashboard` signed out | Redirected to login | ✅ → `/login` |
+| 8 | Open on a 375px phone | ☰ opens the menu, nothing overflows sideways | ✅ menu works, no h-scroll |
 
-## B. Free chapter access (9–13)
+## B. Free chapter access
 
-| # | Do this | Expect |
-|---|---|---|
-| 9 | Click "Start Chapter 1 free" | Unit 1 opens with no signup. Green "FREE" bar at the top |
-| 10 | Read chapter 1 | Title "Chapter 1: What Python is", real content, "What this unit covers" key points above it |
-| 11 | Click through Ch 1 → 6 | Six chapters, each with different real content. Rail chips jump between them |
-| 12 | Reach chapter 6 | Worked example in a dark code block with a Copy button, "🤔 Think about it" question, and the assignment |
-| 13 | Open `/unit/9` directly in the address bar | "Unit 9 is part of the full course" — **the chapter text must not appear** |
+| # | Do this | Expect | Status |
+|---|---|---|---|
+| 9 | Click "Start Chapter 1 free" | Unit 1 opens, no signup, green FREE bar | ✅ |
+| 10 | Read chapter 1 | "Chapter 1: What Python is" + 3 key points | ✅ |
+| 11 | Click through Ch 1 → 6 | 6 chapters, all different real content | ✅ 6 distinct titles |
+| 12 | Reach chapter 6 | Code block + Copy, "🤔 Think about it", assignment | ✅ all three |
+| 13 | Type `/unit/9` in the address bar | Enrol gate — **chapter text must not appear** | ✅ no content leaked |
 
-## C. Registration and login (14–19)
+## C. Registration & login
 
-| # | Do this | Expect |
-|---|---|---|
-| 14 | Click "Get started" → Register | Form with name, email, phone, class, school, student ID, password |
-| 15 | Submit with a 5-character password | Rejected with a clear message, not a crash |
-| 16 | Register properly, then sign in | Lands on the dashboard, not back on the login form |
-| 17 | While signed in but unpaid, open the units list | Unit 1 open; the other 25 locked; an "Unlock all units" banner |
-| 18 | Click "Unlock all units" | Enrolment screen with the price and a "Pay & Get Access" button |
-| 19 | Click "Pay & Get Access" | ⚠️ Fails until Razorpay keys are set — that is expected right now |
+| # | Do this | Expect | Status |
+|---|---|---|---|
+| 14 | "Get started" → Register | Name, email, phone, class, school, student ID, password | ⬜ |
+| 15 | Submit a 5-character password | Clear rejection, no crash | ⬜ |
+| 16 | Register properly, then sign in | Lands on the dashboard | ⬜ |
+| 17 | Signed in but unpaid, view units | Unit 1 open, 25 locked, unlock banner | ⬜ |
+| 18 | Click "Unlock all units" | Enrolment screen with price | ⬜ |
+| 19 | Click "Pay & Get Access" | ⚠️ Fails until Razorpay keys are set | ⬜ |
 
-## D. Student dashboard (20–24)
+## D. Student dashboard
 
-| # | Do this | Expect |
-|---|---|---|
-| 20 | Open a chapter and click "Mark this chapter complete" | Turns into "✓ Chapter complete"; the rail chip turns green |
-| 21 | Log out, log back in, reopen that chapter | Still marked complete — progress survives a session |
-| 22 | Open 📅 Attendance | Streak, days studied, and a 12-week grid with today filled in |
-| 23 | Open 👤 Profile, change your phone, save | Saves and shows "Profile saved". Email and access status are read-only |
-| 24 | Click 💬 (bottom right), ask "explain lists vs tuples" | A real answer within a few seconds. Try a Hinglish question too |
+| # | Do this | Expect | Status |
+|---|---|---|---|
+| 20 | Open a chapter → "Mark this chapter complete" | "✓ Chapter complete", rail chip turns green | ⬜ |
+| 21 | Log out, log back in, reopen it | Still complete | ⬜ |
+| 22 | Open 📅 Attendance | Streak, days studied, 12-week grid | ⬜ |
+| 23 | 👤 Profile → change phone → Save | Saves; email and access are read-only | ⬜ |
+| 24 | 💬 → "explain lists vs tuples" | Real answer in a few seconds. Try Hinglish | ⬜ |
 
-## E. Admin (25–30) — needs the admin account
+## E. Admin
 
-| # | Do this | Expect |
-|---|---|---|
-| 25 | Log in as admin | Admin dashboard, not the student one |
-| 26 | 📘 Units & Chapters → Edit unit 2 → change the title → Save | Title changes on the public catalogue immediately, no redeploy |
-| 27 | Open a unit's Chapters → edit a chapter's text → Save | The new text appears for students right away |
-| 28 | Tick "Free unit" on unit 2 and save, then open `/unit/2` **signed out** | Unit 2 is now readable. Untick it and confirm it locks again |
-| 29 | 🎬 Videos → upload a small MP4 to unit 1 → open unit 1 as a student | The video appears and plays |
-| 30 | 🔔 Announcements → send to every student → open a student account | Bell shows an unread badge; the message is there; "Mark all read" clears it |
+| # | Do this | Expect | Status |
+|---|---|---|---|
+| 25 | Log in as admin | Admin dashboard, not the student one | ⬜ |
+| 26 | 📘 Units & Chapters → edit unit 2 title → Save | Changes on the public catalogue instantly | ⬜ |
+| 27 | Edit a chapter's text → Save | New text live for students immediately | ⬜ |
+| 28 | Tick "Free unit" on unit 2, open `/unit/2` **signed out** | Readable. Untick → locks again | ⬜ |
+| 29 | 🎬 Videos → upload a small MP4 to unit 1 | Appears and plays for a student | ⬜ |
+| 30 | 🔔 Announcements → send to everyone | Bell badge appears; "Mark all read" clears it | ⬜ |
 
 ---
+
+## Also worth testing now
+
+The quiz bank was rebuilt — it previously had 36 rows but only 8 distinct
+questions, with units 3–17 sharing two placeholders and 18–26 having none.
+Every unit now has 5 real questions.
+
+| # | Do this | Expect |
+|---|---|---|
+| A | Finish unit 1 → "Take Quiz" | 5 questions about Python, not "What is a good practice when learning a new unit?" |
+| B | Answer 3 of 5 correctly | 60% — passes, and the unit is marked complete |
+| C | Answer 2 of 5 | 40% — fails, with an explanation shown for every question |
+| D | Open a unit in the 18–26 range as an enrolled student | The quiz loads instead of "No questions for this unit yet" |
 
 ## Known blockers
 
 | | |
 |---|---|
-| Razorpay | Not configured in test or live. Enrolment cannot complete (case 19) |
-| Admin account | None exists. Cases 25–30 are blocked until one is promoted |
+| Razorpay | Not configured in test or live. Case 19 blocked |
+| Webhook | Payment success does not grant access — a webhook-driven trigger does. It has never been exercised because webhooks cannot reach localhost. Now the site is on a public HTTPS URL, this is finally testable, and it is the highest-risk untested path in the project |
 
-## What has not been verified by anyone yet
+## Automated coverage
 
-Cases 20–30 have not been run end to end — they need a signed-in account,
-which was not available during development. Everything in sections A and B
-has been verified directly.
+`npm test` — 71 tests, 9 suites. Covers the free/paid access rules, attendance
+streak maths, chapter progress grouping, notification read-state merging,
+profile validation, file upload validation for videos and resources, and route
+parsing. These are the pure-logic paths behind the screens nobody has clicked.
