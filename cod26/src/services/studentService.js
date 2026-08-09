@@ -1,16 +1,18 @@
 import insforge, { unwrap } from "../lib/insforge";
 
 const studentService = {
-  async progress(userId) {
+  /** totalUnits comes from the catalogue, which an admin can change. */
+  async progress(userId, totalUnits = 0) {
     const rows = unwrap(
       await insforge.database.from("unit_progress").select("*").eq("user_id", userId)
     );
     const unitsCompleted = rows.filter((r) => r.completed).map((r) => r.unit_id);
-    const totalUnits = 17;
     return {
       rows,
       unitsCompleted,
-      totalProgress: Math.round((unitsCompleted.length / totalUnits) * 100),
+      totalProgress: totalUnits
+        ? Math.round((unitsCompleted.length / totalUnits) * 100)
+        : 0,
     };
   },
 

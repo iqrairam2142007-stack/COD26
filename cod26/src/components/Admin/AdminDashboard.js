@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
 import adminService from "../../services/adminService";
+import VideoManager from "./VideoManager";
+import ContentManager from "./ContentManager";
+import ResourceManager from "./ResourceManager";
+import Announcements from "./Announcements";
+import AttendanceReport from "./AttendanceReport";
+import { Link, navigate } from "../../lib/router";
 
-const navStyle = { background: "var(--navy)", color: "#fff", display: "flex", alignItems: "center",
-  justifyContent: "space-between", padding: "12px 22px", position: "sticky", top: 0, zIndex: 50 };
-const sideStyle = { width: 210, background: "#fff", borderRight: "1px solid var(--border)", padding: "16px 0", flexShrink: 0 };
-const mi = (a) => ({ display: "flex", gap: 11, padding: "12px 18px", color: a ? "var(--orange)" : "var(--grey)",
-  fontWeight: 600, width: "100%", textAlign: "left", background: a ? "var(--light)" : "transparent",
-  borderLeft: "3px solid " + (a ? "var(--orange)" : "transparent"), fontSize: ".92rem" });
 const td = { padding: 11, borderBottom: "1px solid #f1e7d6", fontSize: ".88rem" };
 const th = { background: "var(--orange)", color: "#fff", textAlign: "left", padding: 11, fontSize: ".85rem" };
 const tableStyle = { width: "100%", borderCollapse: "collapse", background: "#fff", borderRadius: 12,
@@ -16,31 +16,49 @@ const tableStyle = { width: "100%", borderCollapse: "collapse", background: "#ff
 export default function AdminDashboard() {
   const { profile, logout } = useAuth();
   const [view, setView] = useState("dash");
-  const items = [["dash", "📊 Dashboard"], ["students", "👥 Students"], ["activity", "📈 Activity"], ["codes", "🏫 School Codes"]];
+  const items = [
+    ["dash", "📊 Dashboard"],
+    ["content", "📘 Units & Chapters"],
+    ["videos", "🎬 Videos"],
+    ["resources", "📎 Resources"],
+    ["students", "👥 Students"],
+    ["attendance", "📅 Attendance"],
+    ["announce", "🔔 Announcements"],
+    ["activity", "📈 Activity"],
+    ["codes", "🏫 School Codes"],
+  ];
 
   return (
     <div>
-      <div style={navStyle}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, fontWeight: 800, fontSize: "1.3rem" }}>
-          <div style={{ width: 34, height: 34, borderRadius: 9, background: "linear-gradient(135deg,var(--orange),var(--orange2))",
-            display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 900, fontSize: ".85rem" }}>C26</div>
-          COD26 Admin
+      <header className="topbar">
+        <Link to="/" className="brand">
+          <span className="brand-mark">C26</span>
+          <span>COD26 Admin</span>
+        </Link>
+        <div className="topbar-right">
+          <span className="topbar-name">{profile?.name}</span>
+          <button className="btn btn-primary btn-sm"
+            onClick={async () => { await logout(); navigate("/"); }}>Logout</button>
         </div>
-        <div style={{ display: "flex", gap: 14, alignItems: "center", fontSize: ".9rem" }}>
-          <span style={{ color: "#cbd5e1" }}>{profile?.name}</span>
-          <button onClick={logout} style={{ background: "var(--orange)", color: "#fff", padding: "7px 14px", borderRadius: 8, fontWeight: 600 }}>Logout</button>
-        </div>
-      </div>
-      <div style={{ display: "flex", minHeight: "calc(100vh - 58px)" }}>
-        <div style={sideStyle}>
-          {items.map(([k, l]) => <button key={k} style={mi(view === k)} onClick={() => setView(k)}>{l}</button>)}
-        </div>
-        <div style={{ flex: 1, padding: 26, overflowY: "auto" }}>
+      </header>
+      <div className="shell">
+        <nav className="sidebar">
+          {items.map(([k, l]) => (
+            <button key={k} className={"navitem" + (view === k ? " is-active" : "")}
+              onClick={() => setView(k)}>{l}</button>
+          ))}
+        </nav>
+        <main className="content">
           {view === "dash" && <Dash />}
           {view === "students" && <Students />}
           {view === "activity" && <Activity />}
           {view === "codes" && <Codes />}
-        </div>
+          {view === "videos" && <VideoManager />}
+          {view === "content" && <ContentManager />}
+          {view === "resources" && <ResourceManager />}
+          {view === "announce" && <Announcements />}
+          {view === "attendance" && <AttendanceReport />}
+        </main>
       </div>
     </div>
   );

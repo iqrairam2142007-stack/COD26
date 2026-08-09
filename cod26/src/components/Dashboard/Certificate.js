@@ -1,12 +1,13 @@
 import React from "react";
-import { TOTAL_UNITS } from "../../data/unitdata";
+import { useContent } from "../../context/ContentContext";
 
 const k = { fontSize: ".72rem", color: "var(--muted)" };
 const v = { fontWeight: 700, color: "var(--navy)" };
 
 export default function Certificate({ progress, userName }) {
+  const { totalUnits } = useContent();
   const completed = (progress.unitsCompleted || []).length;
-  const total = TOTAL_UNITS;
+  const total = totalUnits;
   const eligible = completed >= total;
   const pct = progress.totalProgress || 0;
 

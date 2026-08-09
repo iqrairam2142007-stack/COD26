@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
 import studentService from "../../services/studentService";
 
-const td = { padding: 11, borderBottom: "1px solid #f1e7d6", fontSize: ".88rem" };
-const th = { background: "var(--orange)", color: "#fff", textAlign: "left", padding: 11, fontSize: ".85rem" };
+const td = { padding: 12, borderBottom: "1px solid #f1e7d6", fontSize: ".95rem", whiteSpace: "nowrap" };
+const th = { background: "var(--orange)", color: "#fff", textAlign: "left", padding: 12, fontSize: ".9rem", whiteSpace: "nowrap" };
 
 export default function Leaderboard() {
   const { profile } = useAuth();
@@ -18,8 +18,8 @@ export default function Leaderboard() {
 
   return (
     <>
-      <h2 style={{ fontSize: "1.6rem" }}>🏆 Leaderboard</h2>
-      <p style={{ color: "var(--muted)" }}>Sorted by score, then fastest time</p>
+      <h2 className="page-title">🏆 Leaderboard</h2>
+      <p className="page-sub">Sorted by score, then fastest time</p>
       <div style={{ margin: "12px 0" }}>
         <select value={scope} onChange={(e) => setScope(e.target.value)} style={{ maxWidth: 220 }}>
           <option value="global">Global</option>
@@ -29,6 +29,7 @@ export default function Leaderboard() {
       {board.length === 0 ? (
         <div className="notice">No scores yet - take a quiz to appear here!</div>
       ) : (
+        <div className="table-wrap">
         <table style={{ width: "100%", borderCollapse: "collapse", background: "#fff",
           borderRadius: 12, overflow: "hidden", boxShadow: "0 2px 10px rgba(0,0,0,.05)" }}>
           <thead><tr>{["Rank", "Student", "School", "Unit", "Score", "Time"].map((h) =>
@@ -50,6 +51,7 @@ export default function Leaderboard() {
             })}
           </tbody>
         </table>
+        </div>
       )}
     </>
   );

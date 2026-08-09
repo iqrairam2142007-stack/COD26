@@ -30,4 +30,19 @@ module.exports = {
       return config;
     },
   },
+
+  /**
+   * @insforge/shared-schemas is published as untranspiled ESM. Jest ignores
+   * node_modules by default, so it hit `export *` and the whole suite failed
+   * to start. Transform the @insforge packages instead of skipping them.
+   */
+  jest: {
+    configure: (config) => {
+      config.transformIgnorePatterns = [
+        "node_modules/(?!(@insforge)/)",
+        "^.+\\.module\\.(css|sass|scss)$",
+      ];
+      return config;
+    },
+  },
 };

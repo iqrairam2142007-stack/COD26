@@ -1,67 +1,116 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useAuth } from "../../context/AuthContext";
+import { useContent } from "../../context/ContentContext";
 import studentService from "../../services/studentService";
-import { unitData, TOTAL_UNITS } from "../../data/unitdata";
-import UnitReader from "./UnitReader";
+import attendanceService from "../../services/attendanceService";
+import { canOpenUnit, isUnitFree } from "../../config/access";
+import { Link, navigate } from "../../lib/router";
+import ChapterReader from "./ChapterReader";
 import Quiz from "./Quiz";
 import Leaderboard from "./Leaderboard";
 import Certificate from "./Certificate";
+import Profile from "./Profile";
+import Attendance from "./Attendance";
+import NotificationBell from "./NotificationBell";
+import EnrolGate from "../Auth/EnrolGate";
+import ChatWidget from "../Chat/ChatWidget";
 
-const navStyle = { background: "var(--navy)", color: "#fff", display: "flex", alignItems: "center",
-  justifyContent: "space-between", padding: "12px 22px", position: "sticky", top: 0, zIndex: 50 };
-const sideStyle = { width: 210, background: "#fff", borderRight: "1px solid var(--border)", padding: "16px 0", flexShrink: 0 };
-const mi = (a) => ({ display: "flex", gap: 11, padding: "12px 18px", color: a ? "var(--orange)" : "var(--grey)",
-  fontWeight: 600, width: "100%", textAlign: "left", background: a ? "var(--light)" : "transparent",
-  borderLeft: "3px solid " + (a ? "var(--orange)" : "transparent"), fontSize: ".92rem" });
-
-export default function StudentDashboard() {
+export default function StudentDashboard({ tier = "full" }) {
   const { profile, logout } = useAuth();
+  const { totalUnits } = useContent();
   const [view, setView] = useState("units");
   const [openUnit, setOpenUnit] = useState(null);
+  const [chapterIndex, setChapterIndex] = useState(0);
   const [inQuiz, setInQuiz] = useState(false);
   const [progress, setProgress] = useState({ unitsCompleted: [], totalProgress: 0 });
 
   const loadProgress = useCallback(async () => {
     if (!profile) return;
     try {
-      setProgress(await studentService.progress(profile.id));
+      setProgress(await studentService.progress(profile.id, totalUnits));
     } catch {
       /* a progress fetch failure should not blank the dashboard */
     }
-  }, [profile]);
+  }, [profile, totalUnits]);
 
   useEffect(() => { loadProgress(); }, [loadProgress]);
 
-  const items = [["units", "📚 Units"], ["leaderboard", "🏆 Leaderboard"], ["certificate", "📜 Certificate"]];
+  // Stamp today's attendance once the student is actually in the dashboard.
+  useEffect(() => {
+    if (profile) attendanceService.mark();
+  }, [profile]);
+
+  const items = [
+    ["units", "📚", "Units"],
+    ["leaderboard", "🏆", "Leaderboard"],
+    ["attendance", "📅", "Attendance"],
+    ["profile", "👤", "Profile"],
+  ];
+  if (tier === "full") items.splice(2, 0, ["certificate", "📜", "Certificate"]);
+
+  const go = (k) => { setView(k); setOpenUnit(null); setInQuiz(false); };
+
+  async function signOut() {
+    await logout();
+    navigate("/");
+  }
 
   return (
     <div>
-      <div style={navStyle}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, fontWeight: 800, fontSize: "1.3rem" }}>
-          <div style={{ width: 34, height: 34, borderRadius: 9, background: "linear-gradient(135deg,var(--orange),var(--orange2))",
-            display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 900, fontSize: ".85rem" }}>C26</div>
-          COD26
+      <header className="topbar">
+        <Link to="/" className="brand">
+          <span className="brand-mark">C26</span>
+          <span>COD26</span>
+        </Link>
+        <div className="topbar-right">
+          <NotificationBell />
+          <span className="topbar-name">{profile?.name}</span>
+          <button className="btn btn-primary btn-sm" onClick={signOut}>Logout</button>
         </div>
-        <div style={{ display: "flex", gap: 14, alignItems: "center", fontSize: ".9rem" }}>
-          <span style={{ color: "#cbd5e1" }}>{profile?.name}</span>
-          <button onClick={logout} style={{ background: "var(--orange)", color: "#fff", padding: "7px 14px", borderRadius: 8, fontWeight: 600 }}>Logout</button>
-        </div>
-      </div>
+      </header>
 
-      <div style={{ display: "flex", minHeight: "calc(100vh - 58px)" }}>
-        <div style={sideStyle}>
-          {items.map(([k, l]) => (
-            <button key={k} style={mi(view === k)}
-              onClick={() => { setView(k); setOpenUnit(null); setInQuiz(false); }}>{l}</button>
+      <div className="shell">
+        <nav className="sidebar">
+          {items.map(([k, icon, label]) => (
+            <button key={k} className={"navitem" + (view === k ? " is-active" : "")}
+              onClick={() => go(k)}>
+              <span aria-hidden="true">{icon}</span>
+              <span>{label}</span>
+            </button>
           ))}
-        </div>
+        </nav>
 
-        <div style={{ flex: 1, padding: 26, overflowY: "auto" }}>
+        <main className="content">
+          {tier !== "full" && view === "units" && !openUnit && (
+            <div className="banner">
+              <div>
+                <strong>You're on the free plan.</strong>
+                <div className="banner-sub">
+                  Free units are open. The other {Math.max(totalUnits - 1, 0)} units
+                  unlock after enrolment.
+                </div>
+              </div>
+              <button className="btn btn-primary" onClick={() => setView("enrol")}>
+                Unlock all units
+              </button>
+            </div>
+          )}
+
           {view === "units" && !openUnit && (
-            <Units progress={progress} onOpen={(id) => { setOpenUnit(id); setInQuiz(false); }} />
+            <Units tier={tier} progress={progress}
+              onOpen={(id) => { setOpenUnit(id); setChapterIndex(0); setInQuiz(false); }}
+              onLocked={() => setView("enrol")} />
           )}
           {view === "units" && openUnit && !inQuiz && (
-            <UnitReader unitId={openUnit} onBack={() => setOpenUnit(null)} onQuiz={() => setInQuiz(true)} />
+            <ChapterReader unitId={openUnit} chapterIndex={chapterIndex} tier={tier}
+              onBack={() => setOpenUnit(null)}
+              onQuiz={() => setInQuiz(true)}
+              onUnlock={() => setView("enrol")}
+              onNavigate={(id, index) => {
+                setOpenUnit(id);
+                setChapterIndex(index);
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }} />
           )}
           {view === "units" && openUnit && inQuiz && (
             <Quiz unitId={openUnit}
@@ -71,37 +120,55 @@ export default function StudentDashboard() {
           )}
           {view === "leaderboard" && <Leaderboard />}
           {view === "certificate" && <Certificate progress={progress} userName={profile?.name} />}
-        </div>
+          {view === "attendance" && <Attendance />}
+          {view === "profile" && <Profile />}
+          {view === "enrol" && <EnrolGate onBack={() => go("units")} />}
+        </main>
       </div>
+
+      <ChatWidget />
     </div>
   );
 }
 
-function Units({ progress, onOpen }) {
+function Units({ tier, progress, onOpen, onLocked }) {
+  const { units, totalUnits, loading } = useContent();
   const done = new Set(progress.unitsCompleted || []);
+
+  if (loading) return <div className="loading">Loading units…</div>;
+
   return (
     <>
-      <h2 style={{ fontSize: "1.6rem" }}>📚 Course Units</h2>
-      <p style={{ color: "var(--muted)" }}>
-        {done.size}/{TOTAL_UNITS} completed · {progress.totalProgress}%
+      <h2 className="page-title">📚 Course Units</h2>
+      <p className="page-sub">
+        {done.size}/{totalUnits} completed · {progress.totalProgress}%
       </p>
-      <div style={{ height: 8, background: "#eee", borderRadius: 99, overflow: "hidden", maxWidth: 420, margin: "8px 0 20px" }}>
-        <div style={{ height: "100%", width: progress.totalProgress + "%",
-          background: "linear-gradient(90deg,var(--orange),var(--orange2))" }} />
+      <div className="progress-track">
+        <div className="progress-fill" style={{ width: progress.totalProgress + "%" }} />
       </div>
-      <div style={{ display: "grid", gap: 16, gridTemplateColumns: "repeat(auto-fill,minmax(240px,1fr))" }}>
-        {unitData.map((u) => (
-          <button key={u.id} onClick={() => onOpen(u.id)}
-            style={{ background: "#fff", border: "1px solid var(--border)", borderRadius: 14, padding: 18,
-              textAlign: "left", boxShadow: "0 2px 10px rgba(0,0,0,.05)" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span style={{ fontSize: ".72rem", fontWeight: 700, color: "var(--muted)" }}>UNIT {u.id}</span>
-              {done.has(u.id) && <span style={{ color: "var(--green)", fontWeight: 700 }}>✓</span>}
-            </div>
-            <div style={{ fontWeight: 700, margin: "6px 0", color: "var(--navy)" }}>{u.title}</div>
-            <div style={{ fontSize: ".78rem", color: "var(--muted)" }}>{u.duration} · {u.difficulty}</div>
-          </button>
-        ))}
+
+      <div className="unit-grid">
+        {units.map((u) => {
+          const unlocked = canOpenUnit(tier, u);
+          return (
+            <button key={u.id}
+              className={"unit-card" + (unlocked ? "" : " is-locked")}
+              aria-label={`Unit ${u.id}: ${u.title}${unlocked ? "" : " (locked)"}`}
+              onClick={() => (unlocked ? onOpen(u.id) : onLocked())}>
+              <div className="unit-top">
+                <span className="unit-num">UNIT {u.id}</span>
+                {done.has(u.id) && <span className="unit-done" title="Completed">✓</span>}
+                {!unlocked && <span className="unit-lock" aria-hidden="true">🔒</span>}
+                {unlocked && isUnitFree(u) && tier !== "full" && (
+                  <span className="badge-free">FREE</span>
+                )}
+              </div>
+              <div className="unit-title">{u.title}</div>
+              <div className="unit-meta">{u.duration} · {u.difficulty}</div>
+              {!unlocked && <div className="unit-cta">Locked — Upgrade</div>}
+            </button>
+          );
+        })}
       </div>
     </>
   );

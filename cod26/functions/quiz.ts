@@ -14,6 +14,17 @@ const json = (body: unknown, status = 200) =>
 
 const PASS_MARK = 60;
 
+/**
+ * Whether a unit is free is admin-editable data in public.units, not a
+ * constant. Reading it here means the "free" tick in the admin dashboard
+ * gates the quiz too, with no redeploy.
+ */
+async function isFreeUnit(admin: any, unitId: number): Promise<boolean> {
+  const { data } = await admin.database
+    .from("units").select("is_free").eq("id", unitId).limit(1);
+  return data?.[0]?.is_free === true;
+}
+
 export default async function (req: Request): Promise<Response> {
   if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: cors });
 
@@ -29,15 +40,6 @@ export default async function (req: Request): Promise<Response> {
   // by students under RLS.
   const admin = createAdminClient({ baseUrl, apiKey: Deno.env.get("API_KEY")! });
 
-  // Access gate - a student without active access cannot pull quiz content.
-  const { data: profiles } = await admin.database
-    .from("profiles").select("access_status, access_expires_at").eq("id", userId).limit(1);
-  const profile = profiles?.[0];
-  const expired = profile?.access_expires_at && new Date(profile.access_expires_at) < new Date();
-  if (!profile || profile.access_status !== "active" || expired) {
-    return json({ error: "No active access. Please complete the class fee payment." }, 403);
-  }
-
   let body: any;
   try {
     body = await req.json();
@@ -45,9 +47,26 @@ export default async function (req: Request): Promise<Response> {
     return json({ error: "Invalid JSON body" }, 400);
   }
 
+  // The course length is admin-editable, so validate against the table
+  // rather than a hardcoded upper bound.
   const unitId = Number(body?.unitId);
-  if (!Number.isInteger(unitId) || unitId < 1 || unitId > 17) {
+  if (!Number.isInteger(unitId) || unitId < 1) {
     return json({ error: "Invalid unitId" }, 400);
+  }
+  const { data: unitRows } = await admin.database
+    .from("units").select("id").eq("id", unitId).limit(1);
+  if (!unitRows?.length) return json({ error: "Unknown unit" }, 404);
+
+  // Access gate - runs after unitId is known so the free sample unit can be
+  // let through. Paid units still require active access.
+  if (!(await isFreeUnit(admin, unitId))) {
+    const { data: profiles } = await admin.database
+      .from("profiles").select("access_status, access_expires_at").eq("id", userId).limit(1);
+    const profile = profiles?.[0];
+    const expired = profile?.access_expires_at && new Date(profile.access_expires_at) < new Date();
+    if (!profile || profile.access_status !== "active" || expired) {
+      return json({ error: "No active access. Please complete the class fee payment." }, 403);
+    }
   }
 
   const { data: questions, error } = await admin.database
