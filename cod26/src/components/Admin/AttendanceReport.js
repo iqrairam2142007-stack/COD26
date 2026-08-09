@@ -83,12 +83,12 @@ export default function AttendanceReport() {
 
           <h3 style={{ fontSize: "1.05rem", marginTop: 22 }}>Per student</h3>
           <div className="table-wrap">
-            <table style={{ width: "100%", borderCollapse: "collapse", background: "#fff",
+            <table style={{ width: "100%", borderCollapse: "collapse", background: "var(--surface)",
               borderRadius: 12, overflow: "hidden" }}>
               <thead>
                 <tr>{["Student", "School", "Days present", "Rate"].map((h) => (
-                  <th key={h} style={{ background: "var(--orange)", color: "#fff", textAlign: "left",
-                    padding: 12, fontSize: ".9rem", whiteSpace: "nowrap" }}>{h}</th>
+                  <th key={h} style={{ background: "var(--surface2)", color: "var(--orange)", textAlign: "left",
+                    padding: 12, fontSize: ".9rem", whiteSpace: "nowrap", fontWeight: 700 }}>{h}</th>
                 ))}</tr>
               </thead>
               <tbody>
@@ -109,4 +109,4 @@ export default function AttendanceReport() {
   );
 }
 
-const cell = { padding: 12, borderBottom: "1px solid #f1e7d6", fontSize: ".95rem", whiteSpace: "nowrap" };
+const cell = { padding: 12, borderBottom: "1px solid var(--border)", fontSize: ".95rem", whiteSpace: "nowrap" };

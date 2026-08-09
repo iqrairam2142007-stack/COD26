@@ -18,6 +18,12 @@ export default function SiteNav({ path }) {
 
   return (
     <header className="sitenav">
+      {/* Slim utility bar above the nav, like the reference site. */}
+      <Link to="/unit/1" className="topbanner" onClick={close}>
+        <span className="dot" aria-hidden="true" />
+        <span>Chapter 1 is free for everyone — start reading now</span>
+        <span aria-hidden="true">→</span>
+      </Link>
       <div className="sitenav-inner">
         <Link to="/" className="brand" onClick={close}>
           <span className="brand-mark">C26</span>

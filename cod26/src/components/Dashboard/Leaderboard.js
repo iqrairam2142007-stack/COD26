@@ -2,8 +2,10 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
 import studentService from "../../services/studentService";
 
-const td = { padding: 12, borderBottom: "1px solid #f1e7d6", fontSize: ".95rem", whiteSpace: "nowrap" };
-const th = { background: "var(--orange)", color: "#fff", textAlign: "left", padding: 12, fontSize: ".9rem", whiteSpace: "nowrap" };
+const td = { padding: 12, borderBottom: "1px solid var(--border)", fontSize: ".95rem", whiteSpace: "nowrap" };
+// Orange text on a dark header row: white-on-orange only reaches 2.6:1.
+const th = { background: "var(--surface2)", color: "var(--orange)", textAlign: "left", padding: 12,
+  fontSize: ".9rem", whiteSpace: "nowrap", fontWeight: 700 };
 
 export default function Leaderboard() {
   const { profile } = useAuth();
@@ -30,8 +32,8 @@ export default function Leaderboard() {
         <div className="notice">No scores yet - take a quiz to appear here!</div>
       ) : (
         <div className="table-wrap">
-        <table style={{ width: "100%", borderCollapse: "collapse", background: "#fff",
-          borderRadius: 12, overflow: "hidden", boxShadow: "0 2px 10px rgba(0,0,0,.05)" }}>
+        <table style={{ width: "100%", borderCollapse: "collapse", background: "var(--surface)",
+          borderRadius: 12, overflow: "hidden" }}>
           <thead><tr>{["Rank", "Student", "School", "Unit", "Score", "Time"].map((h) =>
             <th key={h} style={th}>{h}</th>)}</tr></thead>
           <tbody>
@@ -39,7 +41,7 @@ export default function Leaderboard() {
               const me = e.user_id === profile?.id;
               const medal = i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : "#" + (i + 1);
               return (
-                <tr key={e.id || i} style={{ background: me ? "#fff3e0" : i % 2 ? "#fffaf3" : "#fff", fontWeight: me ? 600 : 400 }}>
+                <tr key={e.id || i} style={{ background: me ? "rgba(255,122,26,.12)" : i % 2 ? "var(--surface2)" : "var(--surface)", fontWeight: me ? 600 : 400 }}>
                   <td style={td}>{medal}</td>
                   <td style={td}>{e.student_name}{me ? " (You)" : ""}</td>
                   <td style={td}>{e.school}</td>

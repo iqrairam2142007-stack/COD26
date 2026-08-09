@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import studentService from "../../services/studentService";
 
-const box = { background: "#fff", borderRadius: 14, padding: 26, boxShadow: "var(--shadow)", maxWidth: 760 };
+const box = { background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 16,
+  padding: 26, boxShadow: "var(--shadow)", maxWidth: 760 };
 const QUIZ_SECONDS = 30 * 60;
 
 export default function Quiz({ unitId, onBack, onDone, onUnits }) {
@@ -84,18 +85,18 @@ export default function Quiz({ unitId, onBack, onDone, onUnits }) {
     return (
       <div style={box}>
         <h2 style={{ textAlign: "center" }}>Quiz Complete! 🎉</h2>
-        <div style={{ width: 120, height: 120, borderRadius: "50%", margin: "14px auto", color: "#fff",
+        <div style={{ width: 120, height: 120, borderRadius: "50%", margin: "14px auto", color: "#10131a",
           display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-          background: "linear-gradient(135deg,var(--orange),var(--orange2))" }}>
+          background: "linear-gradient(135deg,var(--orange),var(--orange2))", boxShadow: "var(--glow)" }}>
           <div style={{ fontSize: "2rem", fontWeight: 800 }}>{result.percentage}%</div><div>Score</div>
         </div>
         <p style={{ textAlign: "center" }}>{result.correctAnswers}/{result.totalQuestions} correct ·
-          <span style={{ marginLeft: 6, padding: "3px 10px", borderRadius: 999, color: "#fff", fontWeight: 700,
+          <span style={{ marginLeft: 6, padding: "3px 10px", borderRadius: 999, color: "#0c1a13", fontWeight: 700,
             background: result.passed ? "var(--green)" : "var(--red)" }}>{result.passed ? "PASSED" : "FAILED"}</span></p>
         <div style={{ marginTop: 14 }}>
           {result.detailedResults.map((d, i) => (
             <div key={i} style={{ borderLeft: "4px solid " + (d.isCorrect ? "var(--green)" : "var(--red)"),
-              padding: "10px 14px", borderRadius: 8, margin: "8px 0", background: "#fafafa", fontSize: ".88rem" }}>
+              padding: "10px 14px", borderRadius: 8, margin: "8px 0", background: "var(--surface2)", fontSize: ".88rem" }}>
               <strong>Q{i + 1}. {d.question}</strong><br />Your answer: {d.studentAnswer || "(not answered)"}
               {!d.isCorrect && <><br />Correct: <strong>{d.correctAnswer}</strong></>}
               <br /><em>{d.explanation}</em>
@@ -118,7 +119,7 @@ export default function Quiz({ unitId, onBack, onDone, onUnits }) {
         <strong>Question {qi + 1}/{quiz.questions.length}</strong>
         <span style={{ fontWeight: 700, color: time < 300 ? "var(--red)" : "var(--orange)" }}>⏱ {fmt(time)}</span>
       </div>
-      <div style={{ height: 8, background: "#eee", borderRadius: 99, overflow: "hidden", margin: "8px 0" }}>
+      <div style={{ height: 8, background: "var(--surface2)", borderRadius: 99, overflow: "hidden", margin: "8px 0" }}>
         <div style={{ height: "100%", width: ((qi + 1) / quiz.questions.length * 100) + "%",
           background: "linear-gradient(90deg,var(--orange),var(--orange2))" }} />
       </div>
@@ -129,8 +130,9 @@ export default function Quiz({ unitId, onBack, onDone, onUnits }) {
         return (
           <button key={i} onClick={() => setAnswers({ ...answers, [qi]: o })}
             style={{ display: "block", width: "100%", textAlign: "left", padding: "13px 16px",
-              border: "2px solid " + (sel ? "var(--orange)" : "var(--border)"), borderRadius: 10,
-              background: sel ? "var(--light)" : "#fff", margin: "9px 0", fontSize: ".95rem" }}>
+              border: "2px solid " + (sel ? "var(--orange)" : "var(--border2)"), borderRadius: 12,
+              background: sel ? "var(--light)" : "var(--surface2)", color: sel ? "var(--text)" : "var(--grey)",
+              margin: "9px 0", fontSize: ".95rem" }}>
             {String.fromCharCode(65 + i)}) {o}
           </button>
         );

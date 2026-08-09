@@ -8,10 +8,11 @@ import Announcements from "./Announcements";
 import AttendanceReport from "./AttendanceReport";
 import { Link, navigate } from "../../lib/router";
 
-const td = { padding: 11, borderBottom: "1px solid #f1e7d6", fontSize: ".88rem" };
-const th = { background: "var(--orange)", color: "#fff", textAlign: "left", padding: 11, fontSize: ".85rem" };
-const tableStyle = { width: "100%", borderCollapse: "collapse", background: "#fff", borderRadius: 12,
-  overflow: "hidden", boxShadow: "0 2px 10px rgba(0,0,0,.05)" };
+const td = { padding: 11, borderBottom: "1px solid var(--border)", fontSize: ".88rem" };
+const th = { background: "var(--surface2)", color: "var(--orange)", textAlign: "left", padding: 11,
+  fontSize: ".85rem", fontWeight: 700 };
+const tableStyle = { width: "100%", borderCollapse: "collapse", background: "var(--surface)",
+  borderRadius: 12, overflow: "hidden", border: "1px solid var(--border)" };
 
 export default function AdminDashboard() {
   const { profile, logout } = useAuth();
@@ -66,7 +67,7 @@ export default function AdminDashboard() {
 
 function Stat({ n, l, ic }) {
   return (
-    <div style={{ background: "#fff", borderRadius: 14, padding: 20, boxShadow: "0 2px 10px rgba(0,0,0,.05)", border: "1px solid var(--border)" }}>
+    <div style={{ background: "var(--surface)", borderRadius: 16, padding: 20, border: "1px solid var(--border)" }}>
       <div style={{ fontSize: "1.3rem" }}>{ic}</div>
       <div style={{ fontSize: "2rem", fontWeight: 800, color: "var(--orange)" }}>{n}</div>
       <div style={{ color: "var(--muted)", fontSize: ".85rem" }}>{l}</div>
@@ -152,16 +153,16 @@ function Students() {
       {logs && (
         <div onClick={() => setLogs(null)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.55)",
           display: "flex", alignItems: "center", justifyContent: "center", zIndex: 80, padding: 16 }}>
-          <div onClick={(e) => e.stopPropagation()} style={{ background: "#fff", borderRadius: 14, maxWidth: 560,
-            width: "100%", maxHeight: "80vh", overflow: "auto", padding: 22 }}>
+          <div onClick={(e) => e.stopPropagation()} style={{ background: "var(--surface)", border: "1px solid var(--border2)",
+            borderRadius: 16, maxWidth: 560, width: "100%", maxHeight: "80vh", overflow: "auto", padding: 22 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <h3>Activity Log - {logs.name}</h3>
               <button className="btn btn-ghost" style={{ padding: "5px 12px" }} onClick={() => setLogs(null)}>✕</button>
             </div>
             <div style={{ marginTop: 12 }}>
               {logs.items.length ? logs.items.map((l, i) => (
-                <div key={i} style={{ borderLeft: "4px solid var(--border)", padding: "10px 14px", borderRadius: 8,
-                  margin: "8px 0", background: "#fafafa", fontSize: ".88rem" }}>
+                <div key={i} style={{ borderLeft: "4px solid var(--border2)", padding: "10px 14px", borderRadius: 8,
+                  margin: "8px 0", background: "var(--surface2)", fontSize: ".88rem" }}>
                   <strong>{l.activityType}</strong> · {new Date(l.timestamp).toLocaleString()}<br />{l.activityDescription}
                   <div style={{ fontSize: ".75rem", color: "var(--muted)" }}>device: {l.deviceType}</div>
                 </div>
@@ -184,8 +185,9 @@ function Activity() {
       <p style={{ color: "var(--muted)" }}>Every student action across the platform</p>
       <div style={{ margin: "12px 0" }}>
         {Object.entries(d.summary.byType).map(([k, v]) => (
-          <span key={k} style={{ display: "inline-block", padding: "3px 10px", borderRadius: 999, color: "#fff",
-            fontSize: ".72rem", fontWeight: 700, background: "var(--navy)", marginRight: 6, marginBottom: 6 }}>{k}: {v}</span>
+          <span key={k} style={{ display: "inline-block", padding: "3px 10px", borderRadius: 999, color: "var(--grey)",
+            fontSize: ".72rem", fontWeight: 700, background: "var(--surface2)", border: "1px solid var(--border2)",
+            marginRight: 6, marginBottom: 6 }}>{k}: {v}</span>
         ))}
       </div>
       <table style={tableStyle}>
@@ -226,13 +228,14 @@ function Codes() {
         <button className="btn btn-primary" onClick={create}>+ Create Code</button>
       </div>
       {codes.map((c) => (
-        <div key={c.code} style={{ background: "#fff", borderRadius: 14, padding: 18, boxShadow: "0 2px 10px rgba(0,0,0,.05)",
+        <div key={c.code} style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 16, padding: 18,
           marginBottom: 12, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10 }}>
-          <div><strong>{c.schoolName}</strong><br />
-            <code style={{ background: "var(--navy)", color: "#fff", padding: "3px 8px", borderRadius: 6 }}>{c.code}</code></div>
+          <div><strong style={{ color: "var(--text)" }}>{c.schoolName}</strong><br />
+            <code style={{ background: "var(--surface2)", border: "1px solid var(--border2)", color: "var(--orange)",
+              padding: "3px 8px", borderRadius: 8 }}>{c.code}</code></div>
           <div style={{ textAlign: "right" }}>
             <div>{c.usedCount}/{c.maxUses} used</div>
-            <span style={{ padding: "3px 10px", borderRadius: 999, color: "#fff", fontSize: ".72rem", fontWeight: 700,
+            <span style={{ padding: "3px 10px", borderRadius: 999, color: "#0c1a13", fontSize: ".72rem", fontWeight: 700,
               background: c.isActive ? "var(--green)" : "var(--red)" }}>{c.isActive ? "Active" : "Inactive"}</span>
           </div>
         </div>

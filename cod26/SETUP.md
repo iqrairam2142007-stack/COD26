@@ -73,10 +73,12 @@ code example, a discussion question and an assignment — is now restored.
 | Discussion questions | 26 |
 | Assignments | 26 |
 
-**Unit ids never move.** Ids 1–17 keep their original meaning so no
-`unit_progress` row is orphaned; the nine new units are ids 18–26. Display
-order comes from `position`, which is why "Final Projects" (id 17) correctly
-sits last at position 26.
+**Ids now equal course order.** Units are numbered 1–26 in the sequence a
+student studies them, with "Final Projects" as unit 26. The renumbering
+migration (`20260810090000`) was safe because no student data existed at the
+time; chapters, quiz questions and unit content all moved with their units
+(verified: every unit still has 6 chapters, 5 questions and its content row).
+From here on, treat ids as stable — student progress now references them.
 
 The nine added units continue after Encapsulation & Abstraction:
 comprehensions and lambdas, iterators and generators, decorators, regular
