@@ -9,6 +9,7 @@ import CoursesPage from "./components/Public/CoursesPage";
 import PublicUnit from "./components/Public/PublicUnit";
 import NotFound from "./components/Public/NotFound";
 import AuthPage from "./components/Auth/AuthPage";
+import AdminLogin from "./components/Auth/AdminLogin";
 import StudentDashboard from "./components/Dashboard/StudentDashboard";
 import AdminDashboard from "./components/Admin/AdminDashboard";
 import "./styles/global.css";
@@ -32,6 +33,9 @@ function Shell() {
       navigate("/login", { replace: true });
     } else if (user && path === "/login") {
       navigate(isAdmin ? "/admin" : "/dashboard", { replace: true });
+    } else if (user && isAdmin && path === "/admin/login") {
+      // The staff door only holds a signed-out visitor; an admin passes through.
+      navigate("/admin", { replace: true });
     } else if (user && !isAdmin && path === "/admin") {
       navigate("/dashboard", { replace: true });
     } else if (user && isAdmin && path === "/dashboard") {
@@ -59,6 +63,7 @@ function Shell() {
       chapterIndex={unitMatch[2] ? Number(unitMatch[2]) - 1 : 0} />;
   }
   else if (path === "/login") page = <AuthPage />;
+  else if (path === "/admin/login") page = <AdminLogin />;
   else page = <NotFound />;
 
   return (

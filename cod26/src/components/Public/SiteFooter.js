@@ -31,6 +31,7 @@ export default function SiteFooter() {
           <Link to="/login">Log in</Link>
           <Link to="/login?tab=register">Register</Link>
           <Link to="/login?tab=school">School code</Link>
+          <Link to="/admin/login">Staff sign in</Link>
         </div>
 
         <div className="sitefooter-col">

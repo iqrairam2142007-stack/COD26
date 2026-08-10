@@ -1523,6 +1523,152 @@ a.unit-card { text-decoration: none; color: inherit; }
   .topbanner { font-size: .74rem; }
 }
 
+/* ==================================================== admin sign-in */
+.admin-card { text-align: center; }
+.admin-card .field, .admin-card .error { text-align: left; }
+.admin-badge {
+  width: 58px;
+  height: 58px;
+  margin: 0 auto 14px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--orange), var(--orange2));
+  box-shadow: var(--glow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+.admin-title { font-size: 1.35rem; }
+
+/* ========================================================== motion
+ * Additive only. Every animation moves opacity or transform, so nothing
+ * reflows and no colour, size or copy changes.
+ *
+ * Load-bearing rule: no entrance animation touches opacity.
+ *
+ * A backgrounded tab pauses animations at frame 0, and fill-mode `both`
+ * holds that frame - so a fade-in would leave the entire page invisible
+ * until the tab was focused. Verified: with the tab hidden, every animation
+ * reported playState "running" at currentTime 0. Transform-only means the
+ * worst case is content sitting 12px low, which nobody can perceive as a
+ * fault. The same property keeps the page correct when the reduced-motion
+ * block at the end of this file disables animation entirely.
+ */
+@keyframes cod-rise { from { transform: translateY(12px); } }
+@keyframes cod-pop  { from { transform: scale(.96); } }
+/* Tap targets pop outward, never inward: a frozen or in-flight animation
+   must not shrink a 44px control below the touch minimum. */
+@keyframes cod-swell { from { transform: scale(1.08); } }
+@keyframes cod-spin    { to   { transform: rotate(360deg); } }
+@keyframes cod-blink   { 50%  { opacity: .35; transform: scale(.72); } }
+@keyframes cod-ping {
+  0%        { box-shadow: 0 0 0 0 rgba(216, 109, 31, .40); }
+  70%, 100% { box-shadow: 0 0 0 16px rgba(216, 109, 31, 0); }
+}
+
+/* Reusable entrance, e.g. the admin card. */
+.fade-up { animation: cod-rise .45s ease both; }
+
+/* ------------------------------------------------- loading indicator */
+/* The bare "Loading…" text now has a spinner. The ring is a real border,
+   so it still reads as a loading affordance when motion is reduced. */
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+}
+.loading::before {
+  content: "";
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 3px solid var(--border);
+  border-top-color: var(--orange);
+  animation: cod-spin .8s linear infinite;
+}
+
+/* ---------------------------------------------------------- entrances */
+.card { animation: cod-rise .45s ease both; }
+.hero-inner > * { animation: cod-rise .55s ease both; }
+.hero-inner > *:nth-child(2) { animation-delay: .06s; }
+.hero-inner > *:nth-child(3) { animation-delay: .12s; }
+.hero-inner > *:nth-child(4) { animation-delay: .18s; }
+.hero-inner > *:nth-child(5) { animation-delay: .24s; }
+
+/* Cards arrive in sequence rather than all at once. Capped at ten steps so
+   a 26-unit catalogue does not take a second and a half to settle. */
+.unit-grid .unit-card,
+.feature-grid .feature,
+.stat-row .stat-tile { animation: cod-rise .4s ease both; }
+.unit-grid .unit-card:nth-child(1),  .feature-grid .feature:nth-child(1)  { animation-delay: .02s; }
+.unit-grid .unit-card:nth-child(2),  .feature-grid .feature:nth-child(2)  { animation-delay: .05s; }
+.unit-grid .unit-card:nth-child(3),  .feature-grid .feature:nth-child(3)  { animation-delay: .08s; }
+.unit-grid .unit-card:nth-child(4),  .feature-grid .feature:nth-child(4)  { animation-delay: .11s; }
+.unit-grid .unit-card:nth-child(5),  .feature-grid .feature:nth-child(5)  { animation-delay: .14s; }
+.unit-grid .unit-card:nth-child(6),  .feature-grid .feature:nth-child(6)  { animation-delay: .17s; }
+.unit-grid .unit-card:nth-child(7)  { animation-delay: .20s; }
+.unit-grid .unit-card:nth-child(8)  { animation-delay: .23s; }
+.unit-grid .unit-card:nth-child(9)  { animation-delay: .26s; }
+.unit-grid .unit-card:nth-child(n+10) { animation-delay: .29s; }
+.stat-row .stat-tile:nth-child(2) { animation-delay: .06s; }
+.stat-row .stat-tile:nth-child(3) { animation-delay: .12s; }
+
+/* Panels that appear on demand. */
+.chat-panel  { animation: cod-pop .22s ease; }
+.bell-panel  { animation: cod-rise .18s ease both; }
+.bubble      { animation: cod-rise .25s ease both; }
+.reader-body { animation: cod-rise .35s ease both; }
+
+/* -------------------------------------------------- micro-interactions */
+.btn {
+  transition: transform .12s ease, box-shadow .2s ease,
+              border-color .2s ease, color .2s ease;
+}
+.btn:active:not(:disabled) { transform: scale(.97); }
+
+.unit-card, .feature, .resource-item, .chapter-chip, .stat-tile {
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.unit-card:not(.is-locked):hover { transform: translateY(-3px); }
+.feature:hover { transform: translateY(-3px); }
+.resource-item:hover { transform: translateX(3px); }
+
+.navitem, .sitenav-link, .tab, .bell, .chat-close, .codeblock-copy {
+  transition: background-color .18s ease, color .18s ease, border-color .18s ease;
+}
+
+/* An underline that grows from the left on the public nav. */
+.sitenav-link { position: relative; }
+.sitenav-link::after {
+  content: "";
+  position: absolute;
+  left: 13px;
+  right: 13px;
+  bottom: 5px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--orange);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform .22s ease;
+}
+.sitenav-link:hover::after,
+.sitenav-link.is-active::after { transform: scaleX(1); }
+
+/* The "free chapter" dot breathes so the bar reads as live, not static. */
+.topbanner .dot { animation: cod-blink 2.4s ease-in-out infinite; }
+
+/* Three rings on load to point at the assistant, then it settles. */
+.chat-fab { animation: cod-ping 2.4s ease-out 3; }
+.chat-fab:hover { transform: scale(1.06); }
+
+.chapter-chip.is-active { animation: cod-swell .25s ease; }
+
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; }
+  /* The spinner cannot spin, so make it a full ring rather than one that
+     looks like a broken circle frozen mid-turn. */
+  .loading::before { border-color: var(--orange); }
 }
