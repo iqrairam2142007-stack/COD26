@@ -35,7 +35,7 @@ export default function SiteFooter() {
 
         <div className="sitefooter-col">
           <h4>Support</h4>
-          <a href="mailto:hr@ccpromoters.com">hr@ccpromoters.com</a>
+          <a href="mailto:officialcod70@gmail.com">officialcod70@gmail.com</a>
           <span className="sitefooter-fine">
             Enrolled students can ask the in-app assistant any course question.
           </span>

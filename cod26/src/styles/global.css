@@ -242,17 +242,20 @@ input:focus, select:focus {
   color: var(--text);
   text-decoration: none;
 }
+/* The real COD26 badge. Swapped in via CSS so no component markup changes;
+   the "C26" text inside stays as the fallback if the image ever fails, and
+   the wordmark beside it carries the name for screen readers. */
 .brand-mark {
-  width: 34px;
-  height: 34px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, var(--orange), var(--orange2));
-  color: #2b1808;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: url("../assets/cod26-logo.jpg") center / cover no-repeat, #000;
+  color: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 900;
-  font-size: .85rem;
+  font-size: .6rem;
   flex-shrink: 0;
 }
 /* .brand is shared with the public nav, which sits on cream - scope the
